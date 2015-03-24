@@ -19,10 +19,14 @@ mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION"
 
 mysql -uroot -e " GRANT ALL PRIVILEGES ON phpmyadmin.* TO  'pma'@'localhost' IDENTIFIED BY ''"
 
-mysql -uroot -e "CREATE USER 'user'@'localhost' IDENTIFIED BY  'password'"
-mysql -uroot -e "GRANT USAGE ON *.* TO  'user'@'localhost' IDENTIFIED BY 'password'"
-mysql -uroot -e "CREATE DATABASE IF NOT EXISTS db"
-mysql -uroot -e "GRANT ALL PRIVILEGES ON db.* TO 'user'@'localhost'"
+_user=${MYSQL_USER_NAME:-user}
+_userdb=${MYSQL_USER_DB:-db}
+_userpass=${MYSQL_USER_PASS:-password}
+
+mysql -uroot -e "CREATE USER '${_user}'@'localhost' IDENTIFIED BY  '${_userpass}'"
+mysql -uroot -e "GRANT USAGE ON *.* TO  '${_user}'@'localhost' IDENTIFIED BY '${_userpass}'"
+mysql -uroot -e "CREATE DATABASE IF NOT EXISTS ${_userdb}"
+mysql -uroot -e "GRANT ALL PRIVILEGES ON db.* TO '${_user}'@'localhost'"
 
 echo "=> Done!"
 
@@ -35,9 +39,9 @@ echo "Please remember to change the above password as soon as possible!"
 echo "MySQL user 'root' has no password but only allows local connections"
 echo ""
 echo "We also created"
-echo "A database called 'db' and"
-echo "a user called 'user' with password 'password'"
-echo "'user' has full access on 'db'"
+echo "A database called '${_userdb}' and"
+echo "a user called '${_user}' with password '${_userpass}'"
+echo "'${_user}' has full access on '${_userdb}'"
 echo "enjoy!"
 echo "========================================================================"
 

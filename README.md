@@ -15,7 +15,8 @@ osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
 Usage
 -----
 
-To create the image `tutum/lamp`, execute the following command on the osx-docker-lamp folder:
+To create the image `youruser/docker-osx-lamp`, execute the following 
+command from the `osx-docker-lamp` folder:
 
 	docker build -t youruser/docker-osx-lamp .
 
@@ -66,20 +67,20 @@ Environment description
 -----------------------
 
 The /app folder
-===============
+_______________
 
 Apache is configured to serve the files from the `/app` folder, which is a symbolic
 link to `/var/www/html`. In osx-docker-lamp, the apache user `www-data` 
 has full write permissions to the `app` folder.
 
 Apache
-======
+______
 
 Apache is pretty much standard in this image. It is configured to serve the Web app
 at `app` as `/` and phpMyAdmin as `/phpmyadmin`. Mod rewrite is enabled.
 
 phpMyAdmin
-==========
+__________
 
 The latest version of phpMyAdmin is grabbed from sourceforge and installed in
 the folder `/var/www/phpmyadmin`. PhpMyAdmin can be reached from 
@@ -90,7 +91,7 @@ At your convenience, a not-so-random blowfish_secret is stored in phpMyAdmin
 configuration, which is at `/var/www/phpmyadmin/config.inc.php`
 
 The three MySQL users
-=====================
+_____________________
 
 The bundled MySQL server has three  users, that are `root`, `admin`, and `user`. 
 
@@ -123,19 +124,15 @@ The `user` user has full privileges on a database called `db`, which is also cre
 for your convenience.
 
 Environment variables
-=====================
+_____________________
 
-- MYSQL_ADMIN_PASS="mypass" will set your given MySQL password for the `admin` user instead
-of the random one.
-- 
+- MYSQL_ADMIN_PASS="mypass" will use your given MySQL password for the `admin`
+user instead of the random one.
+- MYSQL_USER_NAME="daniel" will use your given MySQL username instead of `user`
+- MYSQL_USER_DB="supercooldb" will use your given database name instead of `db`
+- MYSQL_USER_PASS="supersecretpassword" will use your given password  instead of `password`
 
 
+Set these variables using the `-e` flag when invoking the `docker` client.
 
-If you want to use a preset password instead of a random generated one, you can
-set the environment variable `MYSQL_PASS` to your specific password when running the container:
-
-	docker run -d -p 80:80 -p 3306:3306 -e MYSQL_PASS="mypass" tutum/lamp
-
-You can now test your new admin password:
-
-	mysql -uadmin -p"mypass"
+	docker run -d -p 80:80 -p 3306:3306 -e MYSQL_ADMIN_PASS="mypass" --name mywebsite youruser/my-website
