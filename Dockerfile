@@ -4,21 +4,11 @@ MAINTAINER Daniel Graziotin <daniel@ineed.coffee>
 # based on tutumcloud/tutum-docker-lamp
 # MAINTAINER Fernando Mayo <fernando@tutum.co>, Feng Honglin <hfeng@tutum.co>
 
-# pre-configure phpMyAdmin with default user and password
-RUN echo 'phpmyadmin phpmyadmin/dbconfig-install boolean true' | debconf-set-selections
-RUN echo 'phpmyadmin phpmyadmin/app-password-confirm password password' | debconf-set-selections 
-RUN echo 'phpmyadmin phpmyadmin/mysql/admin-pass password password' | debconf-set-selections
-RUN echo 'phpmyadmin phpmyadmin/mysql/app-pass password password' | debconf-set-selections
-RUN echo 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2' | debconf-set-selections
-
 # Install packages
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
-  apt-get -y install supervisor git apache2 libapache2-mod-php5 mysql-server php5-mysql pwgen php-apc php5-mcrypt zip unzip phpmyadmin && \
+  apt-get -y install supervisor wget git apache2 libapache2-mod-php5 mysql-server php5-mysql pwgen php-apc php5-mcrypt zip unzip  && \
   echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-# Adding phpMyAdmin to the active sites
-RUN echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf
 
 # needed for phpMyAdmin
 run php5enmod mcrypt
@@ -36,9 +26,18 @@ ADD supervisord-mysqld.conf /etc/supervisor/conf.d/supervisord-mysqld.conf
 RUN rm -rf /var/lib/mysql/*
 
 # Add MySQL utils
-ADD create_mysql_admin_user.sh /create_mysql_admin_user.sh
+ADD create_mysql_users.sh /create_mysql_users.sh
 RUN chmod 755 /*.sh
 
+# Add phpmyadmin
+RUN wget -O /tmp/phpmyadmin.tar.gz http://downloads.sourceforge.net/project/phpmyadmin/phpMyAdmin/4.3.12/phpMyAdmin-4.3.12-all-languages.tar.gz
+RUN tar xfvz /tmp/phpmyadmin.tar.gz -C /var/www
+RUN ln -s /var/www/phpMyAdmin-4.3.12-all-languages /var/www/phpmyadmin
+RUN mv /var/www/phpmyadmin/config.sample.inc.php /var/www/phpmyadmin/config.inc.php
+
+RUN sed -i -e "s/cfg\['blowfish_secret'\] = ''/cfg['blowfish_secret'] = '`date | md5sum`'/" /var/www/phpmyadmin/config.inc.php
+
+ENV MYSQL_PASS:-$(pwgen -s 12 1)
 # config to enable .htaccess
 ADD apache_default /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
@@ -57,6 +56,8 @@ VOLUME  ["/etc/mysql", "/var/lib/mysql" ]
 # Tweaks to give Apache/PHP write permissions to the app
 RUN usermod -u 1000 www-data
 RUN usermod -G staff www-data
+RUN chgrp -R www-data /var/www
+RUN chown -R www-data /var/www
 RUN chgrp -R www-data /app
 RUN chown -R www-data /app
 

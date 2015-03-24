@@ -17,6 +17,12 @@ echo "=> Creating MySQL admin user with ${_word} password"
 mysql -uroot -e "CREATE USER 'admin'@'%' IDENTIFIED BY '$PASS'"
 mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION"
 
+mysql -uroot -e " GRANT ALL PRIVILEGES ON phpmyadmin.* TO  'pma'@'localhost' IDENTIFIED BY ''"
+
+mysql -uroot -e "CREATE USER 'user'@'localhost' IDENTIFIED BY  'password'"
+mysql -uroot -e "GRANT USAGE ON *.* TO  'user'@'localhost' IDENTIFIED BY 'password'"
+mysql -uroot -e "CREATE DATABASE IF NOT EXISTS db"
+mysql -uroot -e "GRANT ALL PRIVILEGES ON db.* TO 'user'@'localhost'"
 
 echo "=> Done!"
 
@@ -27,6 +33,12 @@ echo "    mysql -uadmin -p$PASS -h<host> -P<port>"
 echo ""
 echo "Please remember to change the above password as soon as possible!"
 echo "MySQL user 'root' has no password but only allows local connections"
+echo ""
+echo "We also created"
+echo "A database called 'db' and"
+echo "a user called 'user' with password 'password'"
+echo "'user' has full access on 'db'"
+echo "enjoy!"
 echo "========================================================================"
 
 mysqladmin -uroot shutdown
