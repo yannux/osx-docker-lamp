@@ -118,17 +118,18 @@ You will see an output like the following:
 
 In this case, `47nnf4FweaKu` is the password allocated to the `admin` user.
 
-You can then connect to MySQL:
-
-	 mysql -uadmin -p47nnf4FweaKu
-
-
 Finally, a user called `user` with password `password` is created for your convenience.
 The `user` user has full privileges on a database called `db`, which is also created
 for your convenience.
 
 Environment variables
 =====================
+
+- MYSQL_ADMIN_PASS="mypass" will set your given MySQL password for the `admin` user instead
+of the random one.
+- 
+
+
 
 If you want to use a preset password instead of a random generated one, you can
 set the environment variable `MYSQL_PASS` to your specific password when running the container:

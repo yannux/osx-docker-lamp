@@ -10,8 +10,8 @@ while [[ RET -ne 0 ]]; do
     RET=$?
 done
 
-PASS=${MYSQL_PASS:-$(pwgen -s 12 1)}
-_word=$( [ ${MYSQL_PASS} ] && echo "preset" || echo "random" )
+PASS=${MYSQL_ADMIN_PASS:-$(pwgen -s 12 1)}
+_word=$( [ ${MYSQL_ADMIN_PASS} ] && echo "preset" || echo "random" )
 echo "=> Creating MySQL admin user with ${_word} password"
 
 mysql -uroot -e "CREATE USER 'admin'@'%' IDENTIFIED BY '$PASS'"
