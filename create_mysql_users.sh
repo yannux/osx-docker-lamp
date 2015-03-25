@@ -26,7 +26,7 @@ _userpass=${MYSQL_USER_PASS:-password}
 mysql -uroot -e "CREATE USER '${_user}'@'localhost' IDENTIFIED BY  '${_userpass}'"
 mysql -uroot -e "GRANT USAGE ON *.* TO  '${_user}'@'localhost' IDENTIFIED BY '${_userpass}'"
 mysql -uroot -e "CREATE DATABASE IF NOT EXISTS ${_userdb}"
-mysql -uroot -e "GRANT ALL PRIVILEGES ON db.* TO '${_user}'@'localhost'"
+mysql -uroot -e "GRANT ALL PRIVILEGES ON ${_userdb}.* TO '${_user}'@'localhost'"
 
 echo "=> Done!"
 
