@@ -4,6 +4,12 @@ MAINTAINER Daniel Graziotin <daniel@ineed.coffee>
 # based on tutumcloud/tutum-docker-lamp
 # MAINTAINER Fernando Mayo <fernando@tutum.co>, Feng Honglin <hfeng@tutum.co>
 
+# Tweaks to give Apache/PHP write permissions to the app
+RUN usermod -u 1000 www-data
+RUN usermod -G staff www-data
+RUN useradd -r mysql
+RUN usermod -G staff mysql
+
 # Install packages
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
@@ -18,12 +24,11 @@ ADD start-apache2.sh /start-apache2.sh
 ADD start-mysqld.sh /start-mysqld.sh
 ADD run.sh /run.sh
 RUN chmod 755 /*.sh
-ADD my.cnf /etc/mysql/conf.d/my.cnf
 ADD supervisord-apache2.conf /etc/supervisor/conf.d/supervisord-apache2.conf
 ADD supervisord-mysqld.conf /etc/supervisor/conf.d/supervisord-mysqld.conf
 
 # Remove pre-installed database
-RUN rm -rf /var/lib/mysql/*
+RUN rm -rf /var/lib/mysql
 
 # Add MySQL utils
 ADD create_mysql_users.sh /create_mysql_users.sh
@@ -54,8 +59,6 @@ ENV PHP_POST_MAX_SIZE 10M
 VOLUME  ["/etc/mysql", "/var/lib/mysql" ]
 
 # Tweaks to give Apache/PHP write permissions to the app
-RUN usermod -u 1000 www-data
-RUN usermod -G staff www-data
 RUN chgrp -R www-data /var/www
 RUN chown -R www-data /var/www
 RUN chgrp -R www-data /app
