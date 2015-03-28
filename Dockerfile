@@ -58,11 +58,5 @@ ENV PHP_POST_MAX_SIZE 10M
 # Add volumes for MySQL 
 VOLUME  ["/etc/mysql", "/var/lib/mysql" ]
 
-# Tweaks to give Apache/PHP write permissions to the app
-RUN chgrp -R www-data /var/www
-RUN chown -R www-data /var/www
-RUN chgrp -R www-data /app
-RUN chown -R www-data /app
-
 EXPOSE 80 3306
 CMD ["/run.sh"]
