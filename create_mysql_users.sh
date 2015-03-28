@@ -31,7 +31,7 @@ mysql -uroot -e "GRANT ALL PRIVILEGES ON ${_userdb}.* TO '${_user}'@'localhost'"
 echo "=> Done!"
 
 echo "========================================================================"
-echo "You can now connect to this MySQL Server with $PASS:"
+echo "You can now connect to this MySQL Server with $PASS"
 echo ""
 echo "    mysql -uadmin -p$PASS -h<host> -P<port>"
 echo ""

@@ -8,7 +8,7 @@ This is a fork of tutumcloud/tutum-docker-lamp, which is an
 osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
 
 - It fixes OS X related write permission errors for Apache folder
-- It lets you mount OS X folders with write support as volumes for
+- It lets you mount OS X folders *with write support* as volumes for
   - The website
   - The database
 - It creates a default database and user with permissions to that database
@@ -146,3 +146,5 @@ user instead of the random one.
 Set these variables using the `-e` flag when invoking the `docker` client.
 
 	docker run -d -p 80:80 -p 3306:3306 -e MYSQL_ADMIN_PASS="mypass" --name mywebsite youruser/my-website
+
+Please note that these variables will not work if an existing MySQL volume is supplied.
