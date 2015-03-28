@@ -3,11 +3,14 @@ osx-docker-lamp
 
 This is a fork of tutumcloud/tutum-docker-lamp, which is an
 
-	Out-of-the-box LAMP image (PHP+MySQL) on steroids
+	Out-of-the-box LAMP Docker image (Apahce+PHP+MySQL+PhpMyAdmin) on steroids
 
 osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
 
-- It fixes OS X related write permission errors for Apache
+- It fixes OS X related write permission errors for Apache folder
+- It lets you mount OS X folders with write support as volumes for
+  - The website
+  - The database
 - It creates a default database and user with permissions to that database
 - It provides phpMyAdmin at /phpmyadmin
 - It is documented for less advanced users (like me)
@@ -78,6 +81,8 @@ ______
 
 Apache is pretty much standard in this image. It is configured to serve the Web app
 at `app` as `/` and phpMyAdmin as `/phpmyadmin`. Mod rewrite is enabled.
+Apache runs as user www-data and group staff. The write support works because the
+user www-data is setup to have the same user id as the one employed by boot2docker (1000).
 
 phpMyAdmin
 __________
@@ -89,6 +94,11 @@ phpMyAdmin.
 
 At your convenience, a not-so-random blowfish_secret is stored in phpMyAdmin 
 configuration, which is at `/var/www/phpmyadmin/config.inc.php`
+
+MySQL
+-----
+
+MySQL runs as user www-data, as well.
 
 The three MySQL users
 _____________________

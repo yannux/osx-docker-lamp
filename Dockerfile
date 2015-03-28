@@ -5,10 +5,10 @@ MAINTAINER Daniel Graziotin <daniel@ineed.coffee>
 # MAINTAINER Fernando Mayo <fernando@tutum.co>, Feng Honglin <hfeng@tutum.co>
 
 # Tweaks to give Apache/PHP write permissions to the app
-RUN usermod -u 1000 www-data
-RUN usermod -G staff www-data
-RUN useradd -r mysql
-RUN usermod -G staff mysql
+RUN usermod -u 1000 www-data && \
+    usermod -G staff www-data && \
+    useradd -r mysql && \
+    usermod -G staff mysql
 
 # Install packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -40,8 +40,6 @@ RUN tar xfvz /tmp/phpmyadmin.tar.gz -C /var/www
 RUN ln -s /var/www/phpMyAdmin-4.3.12-all-languages /var/www/phpmyadmin
 RUN mv /var/www/phpmyadmin/config.sample.inc.php /var/www/phpmyadmin/config.inc.php
 
-RUN sed -i -e "s/cfg\['blowfish_secret'\] = ''/cfg['blowfish_secret'] = '`date | md5sum`'/" /var/www/phpmyadmin/config.inc.php
-
 ENV MYSQL_PASS:-$(pwgen -s 12 1)
 # config to enable .htaccess
 ADD apache_default /etc/apache2/sites-available/000-default.conf
@@ -51,12 +49,12 @@ RUN a2enmod rewrite
 RUN mkdir -p /app && rm -fr /var/www/html && ln -s /app /var/www/html
 ADD app/ /app
 
-#Enviornment variables to configure php
+#Environment variables to configure php
 ENV PHP_UPLOAD_MAX_FILESIZE 10M
 ENV PHP_POST_MAX_SIZE 10M
 
-# Add volumes for MySQL 
-VOLUME  ["/etc/mysql", "/var/lib/mysql" ]
+# Add volumes for the app and MySql
+VOLUME  ["/etc/mysql", "/var/lib/mysql", "/app" ]
 
 EXPOSE 80 3306
 CMD ["/run.sh"]
