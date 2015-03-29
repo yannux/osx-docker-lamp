@@ -18,7 +18,7 @@ sed -i "s/user.*/user = www-data/" /etc/mysql/my.cnf
 
 chown -R www-data:staff /var/lib/mysql
 chown -R www-data:staff /var/run/mysqld
-chmod -R 660 /var/lib/mysql
+chmod -R 770 /var/lib/mysql
 chmod -R 770 /var/run/mysqld
 
 
