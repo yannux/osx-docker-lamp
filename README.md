@@ -1,10 +1,12 @@
-#osx-docker-lamp
+#osx-docker-lamp, a.k.a dgraziotin/lamp
 
-This is a fork of 
+osx-docker-lamp, which is known as 
+[dgraziotin/lamp](https://registry.hub.docker.com/u/dgraziotin/lamp/) 
+in the Docker Hub, is a fork of 
 [tutumcloud/tutum-docker-lamp](https://github.com/tutumcloud/tutum-docker-lamp), 
-which is an Out-of-the-box LAMP image (PHP+MySQL) for Docker. 
+which is an "Out-of-the-box LAMP image (PHP+MySQL) for Docker". 
 
-dgraziotin/osx-docker-lamp is instead an:
+osx-docker-lamp is instead an:
 
 	Out-of-the-box LAMP+phpMyAdmin Docker image that *just works* on Mac OS X.
 
@@ -25,23 +27,26 @@ osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
 
 ##Usage
 
-If you need to create a custom image `youruser/docker-osx-lamp`, 
+If you need to create a custom image `youruser/lamp`, 
 execute the following command from the `osx-docker-lamp` source folder:
 
-	docker build -t youruser/docker-osx-lamp .
+	docker build -t youruser/lamp .
 
 If you wish, you can push your new image to the registry:
 
-	docker push youruser/docker-osx-lamp
+	docker push youruser/lamp
 
-Otherwise, you are free to use dgraziotin/docker-osx-lamp as it is provided.
+Otherwise, you are free to use dgraziotin/lamp as it is provided. Remember first
+to pull it from the Docker Hub:
+
+    docker pull dgraziotin/lamp
 
 
 ###Running your LAMP docker image
 
 If you start the image without supplying your code, e.g.,
 
-	docker run -t -i -p 80:80 -p 3306:3306 --name osxlamp dgraziotin/docker-osx-lamp
+	docker run -t -i -p 80:80 -p 3306:3306 --name osxlamp dgraziotin/lamp
 
 At http://[boot2docker ip, e.g., 192.168.59.103] you should see an 
 "Hello world!" page.
@@ -62,7 +67,7 @@ The app folder should contain the root of your PHP application.
 
 Run the following code from within the _Project name_ folder.
 
-	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app --name yourwebapp dgraziotin/docker-osx-lamp
+	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app --name yourwebapp dgraziotin/lamp
 
 Test your deployment:
 
@@ -72,7 +77,7 @@ Test your deployment:
 If you wish to mount a MySQL folder locally, so that MySQL files are saved on your
 OS X machine, run the following instead:
 
-	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/mysql:/var/lib/mysql -v ${PWD}/app:/app --name yourwebapp dgraziotin/docker-osx-lamp
+	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/mysql:/var/lib/mysql -v ${PWD}/app:/app --name yourwebapp dgraziotin/lamp
 
 The MySQL database will thus become persistent at each subsequent run of your image.
 
@@ -154,6 +159,6 @@ user instead of the random one.
 
 Set these variables using the `-e` flag when invoking the `docker` client.
 
-	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app -e MYSQL_ADMIN_PASS="mypass" --name yourwebapp dgraziotin/docker-osx-lamp
+	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app -e MYSQL_ADMIN_PASS="mypass" --name yourwebapp dgraziotin/lamp
 
 Please note that the MySQL variables will not work if an existing MySQL volume is supplied.
