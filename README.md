@@ -8,6 +8,8 @@ dgraziotin/osx-docker-lamp is instead an:
 
 	Out-of-the-box LAMP+phpMyAdmin Docker image that *just works* on Mac OS X.
 
+However, it has also been tested for Docker running under GNU/Linux (Ubuntu 14.10).
+
 osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
 
 - It is based on [phusion/baseimage:latest](http://phusion.github.io/baseimage-docker/)
