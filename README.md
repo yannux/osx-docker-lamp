@@ -1,21 +1,20 @@
 #osx-docker-lamp, a.k.a dgraziotin/lamp
 
+    Out-of-the-box LAMP+phpMyAdmin Docker image that *just works* on Mac OS X. 
+    Including write support for mounted volumes (Website, MySQL).
+    No matter if using the official boot2docker or having Vagrant in the stack, as well.
+
 osx-docker-lamp, which is known as 
 [dgraziotin/lamp](https://registry.hub.docker.com/u/dgraziotin/lamp/) 
 in the Docker Hub, is a fork of 
 [tutumcloud/tutum-docker-lamp](https://github.com/tutumcloud/tutum-docker-lamp), 
 which is an "Out-of-the-box LAMP image (PHP+MySQL) for Docker". 
 
-osx-docker-lamp is instead an:
-
-	Out-of-the-box LAMP+phpMyAdmin Docker image that *just works* on Mac OS X.
-
-However, it has also been tested for Docker running under GNU/Linux (Ubuntu 14.10).
-
 osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
 
 - It is based on [phusion/baseimage:latest](http://phusion.github.io/baseimage-docker/)
   instead of ubuntu:trusty.
+- It works flawlessy regardless of using boot2docker standalone or with Vagrant. You will need to set three enrironment varibles, though.
 - It fixes OS X related [write permission errors for Apache](https://github.com/boot2docker/boot2docker/issues/581)
 - It lets you mount OS X folders *with write support* as volumes for
   - The website
@@ -26,6 +25,8 @@ osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
 
 
 ##Usage
+
+    If using Vagrant, please see the extra steps in the next subsection.
 
 If you need to create a custom image `youruser/lamp`, 
 execute the following command from the `osx-docker-lamp` source folder:
@@ -41,6 +42,15 @@ to pull it from the Docker Hub:
 
     docker pull dgraziotin/lamp
 
+###Vagrant
+
+If, for any reason, you would rather use Vagrant (I suggest using [AntonioMeireles/boot2docker-vagrant-box](https://github.com/AntonioMeireles/boot2docker-vagrant-box)), you need to add the following three variables when running your box:
+
+-`VAGRANT_OSX_MODE="true"` for enabling Vagrant-compatibility
+-`DOCKER_USER_ID=$(id -u)` for letting Vagrant use your host user ID for mounted folders
+-`DOCKER_USER_GID=$(id -g)` for letting Vagrant use your host user GID for mounted folders
+
+See the Environment variables section for more options.
 
 ###Running your LAMP docker image
 
@@ -157,14 +167,17 @@ the the `MYSQL_USER_*` variables, explained below.
 
 ##Environment variables
 
-- MYSQL_ADMIN_PASS="mypass" will use your given MySQL password for the `admin`
+- `MYSQL_ADMIN_PASS="mypass"` will use your given MySQL password for the `admin`
 user instead of the random one.
-- CREATE_MYSQL_BASIC_USER_AND_DB="true" will create the user `user` with db `db` and password `password`. Not needed if using one of the following three MYSQL_USER_* variables
-- MYSQL_USER_NAME="daniel" will use your given MySQL username instead of `user`
-- MYSQL_USER_DB="supercooldb" will use your given database name instead of `db`
-- MYSQL_USER_PASS="supersecretpassword" will use your given password  instead of `password`
-- PHP_UPLOAD_MAX_FILESIZE="10M" will change PHP upload_max_filesize config value
-- PHP_POST_MAX_SIZE="10M" will change PHP post_max_size config value
+- `CREATE_MYSQL_BASIC_USER_AND_DB="true"` will create the user `user` with db `db` and password `password`. Not needed if using one of the following three `MYSQL_USER_*` variables
+- `MYSQL_USER_NAME="daniel"` will use your given MySQL username instead of `user`
+- `MYSQL_USER_DB="supercooldb"` will use your given database name instead of `db`
+- `MYSQL_USER_PASS="supersecretpassword"` will use your given password  instead of `password`
+- `PHP_UPLOAD_MAX_FILESIZE="10M"` will change PHP upload_max_filesize config value
+- `PHP_POST_MAX_SIZE="10M"` will change PHP post_max_size config value
+-`VAGRANT_OSX_MODE="true"` for enabling Vagrant-compatibility
+-`DOCKER_USER_ID=$(id -u)` for letting Vagrant use your host user ID for mounted folders
+-`DOCKER_USER_GID=$(id -g)` for letting Vagrant use your host user GID for mounted folders
 
 Set these variables using the `-e` flag when invoking the `docker` client.
 

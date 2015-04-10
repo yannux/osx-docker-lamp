@@ -9,18 +9,26 @@ sed -i "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=staff/" /etc/
 
 sed -i -e "s/cfg\['blowfish_secret'\] = ''/cfg['blowfish_secret'] = '`date | md5sum`'/" /var/www/phpmyadmin/config.inc.php
 
-# Tweaks to give Apache/PHP write permissions to the app
-chown -R www-data:staff /var/www
-chown -R www-data:staff /app
+if [ -n "$VAGRANT_OSX_MODE" ];then
+    usermod -u $DOCKER_USER_ID www-data
+    groupmod -g $(($DOCKER_USER_GID + 10000)) $(getent group $DOCKER_USER_GID | cut -d: -f1)
+    groupmod -g ${DOCKER_USER_GID} staff
+    chmod -R 770 /var/lib/mysql
+    chmod -R 770 /var/run/mysqld
+    chown -R www-data:staff /var/lib/mysql
+    chown -R www-data:staff /var/run/mysqld
+else
+    # Tweaks to give Apache/PHP write permissions to the app
+    chown -R www-data:staff /var/www
+    chown -R www-data:staff /app
+    chown -R www-data:staff /var/lib/mysql
+    chown -R www-data:staff /var/run/mysqld
+    chmod -R 770 /var/lib/mysql
+    chmod -R 770 /var/run/mysqld
+fi
 
 sed -i "s/bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
 sed -i "s/user.*/user = www-data/" /etc/mysql/my.cnf
-
-chown -R www-data:staff /var/lib/mysql
-chown -R www-data:staff /var/run/mysqld
-chmod -R 770 /var/lib/mysql
-chmod -R 770 /var/run/mysqld
-
 
 if [[ ! -d $VOLUME_HOME/mysql ]]; then
     echo "=> An empty or uninitialized MySQL volume is detected in $VOLUME_HOME"
