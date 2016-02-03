@@ -2,12 +2,21 @@
 
 VOLUME_HOME="/var/lib/mysql"
 
-sed -ri -e "s/^upload_max_filesize.*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/" \
-    -e "s/^post_max_size.*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php5/apache2/php.ini \
+# CONF APACHE
+sed -i -e "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=staff/" /etc/apache2/envvars
+sed -i -e "s/##ServerName/ServerName ${APACHE_VHOST_SERVERNAME}/" /etc/apache2/sites-available/default
+sed -i -e "s/^#AddDefaultCharset UTF-8$/AddDefaultCharset UTF-8/" /etc/apache2/conf.d/charset
 
-sed -i "s/export APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=staff/" /etc/apache2/envvars
-
-sed -i "s/##ServerName/ServerName ${APACHE_VHOST_SERVERNAME}/" /etc/apache2/sites-available/default
+# CONF PHP
+sed -ri -e "s/^upload_max_filesize.*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/"
+sed -e "s/^post_max_size.*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php5/apache2/php.ini
+## Quelques paramètres de conf qui ne me conviennent pas, pour une machine de développement / test (https://github.com/pmartin)
+## https://github.com/pmartin/vm-dev-php/blob/master/scripts-install-vm/zz-install-php5.3.sh
+sed -i -e 's/^short_open_tag = On$/short_open_tag = Off/' /etc/php5/apache2/php.ini
+sed -i -e 's/^error_reporting = E_ALL & ~E_DEPRECATED$/error_reporting = E_ALL \& E_STRICT/' /etc/php5/apache2/php.ini
+sed -i -e 's/^display_errors = Off$/display_errors = On/' /etc/php5/apache2/php.ini
+sed -i -e 's/^track_errors = Off$/track_errors = On/' /etc/php5/apache2/php.ini
+sed -i -e 's/^html_errors = Off$/html_errors = On/' /etc/php5/apache2/php.ini
 
 if [ -n "$VAGRANT_OSX_MODE" ];then
     usermod -u $DOCKER_USER_ID www-data

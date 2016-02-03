@@ -23,8 +23,10 @@ RUN usermod -u ${BOOT2DOCKER_ID} www-data && \
 # Install packages
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
-  apt-get -y install supervisor wget git nano apache2 libapache2-mod-php5 mysql-server php5-mysql pwgen php-pear php-apc php5-mcrypt zip unzip php5-imagick php5-xdebug
+    apt-get -y install supervisor wget git nano apache2 libapache2-mod-php5 mysql-server php5-mysql pwgen php-pear php-apc php5-mcrypt zip unzip php5-imagick php5-xdebug
 
+# Add some PHP conf files
+ADD conf/php/xdebug.ini /etc/php5/apache2/conf.d/xdebug.ini
 
 # Add image configuration and scripts
 ADD start-apache2.sh /start-apache2.sh
@@ -49,7 +51,7 @@ RUN a2enmod rewrite & \
     a2ensite default
 
 # Configure /app folder with sample app
-RUN mkdir -p /app && rm -fr /var/www/html && ln -s /app /var/www/html
+RUN mkdir -p /app && rm -fr /var/www && ln -s /app /var/www
 ADD app/ /app
 
 #Environment variables to configure System & PHP & MYSQL
@@ -62,4 +64,5 @@ ENV APACHE_VHOST_SERVERNAME localhost
 VOLUME  ["/etc/mysql", "/var/lib/mysql", "/app" ]
 
 EXPOSE 80 3306
+
 CMD ["/run.sh"]
