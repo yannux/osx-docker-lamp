@@ -1,186 +1,81 @@
-#osx-docker-lamp, a.k.a dgraziotin/lamp
+#yannux/lamp-basic
 
-    Out-of-the-box LAMP+phpMyAdmin Docker image that *just works* on Mac OS X. 
-    Including write support for mounted volumes (Website, MySQL).
-    No matter if using the official boot2docker or having Vagrant in the stack, as well.
+Linux Apache MySQL PHP
 
-osx-docker-lamp, which is known as 
-[dgraziotin/lamp](https://registry.hub.docker.com/u/dgraziotin/lamp/) 
-in the Docker Hub, is a fork of 
-[tutumcloud/tutum-docker-lamp](https://github.com/tutumcloud/tutum-docker-lamp), 
-which is an "Out-of-the-box LAMP image (PHP+MySQL) for Docker". 
+Dockerfile basé sur [osx-docker-lamp, a.k.a dgraziotin/lampp](https://registry.hub.docker.com/u/dgraziotin/lamp/) qui permet de [supporter l'écriture sur les volumes avec Boot2Docker sur Mac OS X](https://github.com/boot2docker/boot2docker/issues/581)
 
-osx-docker-lamp does what tutumcloud/tutum-docker-lamp, plus:
+##Utilisation
 
-- It is based on [phusion/baseimage:latest](http://phusion.github.io/baseimage-docker/)
-  instead of ubuntu:trusty.
-- It works flawlessy regardless of using boot2docker standalone or with Vagrant. You will need to set three enrironment varibles, though.
-- It fixes OS X related [write permission errors for Apache](https://github.com/boot2docker/boot2docker/issues/581)
-- It lets you mount OS X folders *with write support* as volumes for
-  - The website
-  - The database
-- If `CREATE_MYSQL_BASIC_USER_AND_DB="true"`, it creates a default database and user with permissions to that database
-- It provides phpMyAdmin at /phpmyadmin
-- It is documented for less advanced users (like me)
+###Créer un container basique
+
+	docker run -t -i -p 80:80 -p 3306:3306 --name monapp yannux/lamp-basic
+
+À l'adresse http://[boot2docker ip, e.g., 192.168.59.103] vous devriez voir : "Hello world!" et le phpinfo();
 
 
-##Usage
+###Charger votre application PHP
 
-    If using Vagrant, please see the extra steps in the next subsection.
+Structure suggéré du projet sur votre machine
 
-If you need to create a custom image `youruser/lamp`, 
-execute the following command from the `osx-docker-lamp` source folder:
+- _Mon_Projet_
+  - app
+  - mysql (optionnel)
 
-	docker build -t youruser/lamp .
+Le dossier app doit contenir la racine de votre application PHP
 
-If you wish, you can push your new image to the registry:
+Créer un container qui charge votre application en vous plaçant dans votre dossier _Mon_Projet_ :
 
-	docker push youruser/lamp
-
-Otherwise, you are free to use dgraziotin/lamp as it is provided. Remember first
-to pull it from the Docker Hub:
-
-    docker pull dgraziotin/lamp
-
-###Vagrant
-
-If, for any reason, you would rather use Vagrant (I suggest using [AntonioMeireles/boot2docker-vagrant-box](https://github.com/AntonioMeireles/boot2docker-vagrant-box)), you need to add the following three variables when running your box:
-
--`VAGRANT_OSX_MODE="true"` for enabling Vagrant-compatibility
--`DOCKER_USER_ID=$(id -u)` for letting Vagrant use your host user ID for mounted folders
--`DOCKER_USER_GID=$(id -g)` for letting Vagrant use your host user GID for mounted folders
-
-See the Environment variables section for more options.
-
-###Running your LAMP docker image
-
-If you start the image without supplying your code, e.g.,
-
-	docker run -t -i -p 80:80 -p 3306:3306 --name osxlamp dgraziotin/lamp
-
-At http://[boot2docker ip, e.g., 192.168.59.103] you should see an 
-"Hello world!" page.
-
-At http://[boot2docker ip]/phpmyadmin you should see a running phpMyAdmin instance.
+	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app --name monapp yannux/lamp-basic
 
 
-###Loading your custom PHP application
+Pour avoir les donnés MySql dans un dossier local sur votre poste :
 
-In order to replace the _Hello World_ application that comes bundled with this 
-docker image, my suggested layout is the following:
+	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/mysql:/var/lib/mysql -v ${PWD}/app:/app --name monapp yannux/lamp-basic
 
-- _Project name_ folder
-  - app subfolder
-  - mysql subfolder (optional)
-
-The app folder should contain the root of your PHP application.
-
-Run the following code from within the _Project name_ folder.
-
-	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app --name yourwebapp dgraziotin/lamp
-
-Test your deployment:
-
-	http://[boot2docker ip]
-	http://[boot2docker ip]/phpmyadmin
-
-If you wish to mount a MySQL folder locally, so that MySQL files are saved on your
-OS X machine, run the following instead:
-
-	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/mysql:/var/lib/mysql -v ${PWD}/app:/app --name yourwebapp dgraziotin/lamp
-
-The MySQL database will thus become persistent at each subsequent run of your image.
-
-##Environment description
+Votre base de données MySQL sera persistante à chaque itéartion de l'image.
 
 
-###The /app folder
+##Description de l'environment dans le container
 
-Apache is configured to serve the files from the `/app` folder, which is a symbolic
-link to `/var/www/html`. In osx-docker-lamp, the apache user `www-data` 
-has full write permissions to the `app` folder.
+### Programmes
 
-###Apache
+Paquets installés : git, nano, wget
 
-Apache is pretty much standard in this image. It is configured to serve the Web app
-at `app` as `/` and phpMyAdmin as `/phpmyadmin`. Mod rewrite is enabled.
+###Apache && /app
 
-Apache runs as user www-data and group staff. The write support works because the
-user www-data is configured to have the same user id as the one employed by boot2docker (1000).
+Apache est configuré pour servire les fichiers du dossier `/app`.
 
-###phpMyAdmin
+L'utilisateur Apache `www-data` a tous les droits sur le dossier `/app`.
 
-The latest version of phpMyAdmin is grabbed from sourceforge and installed in
-the folder `/var/www/phpmyadmin`. 
+Sur Mac OS X le support de l'écriture, lors de l'utilisation d'un volume,
+fonctionne car l'utilisateur `www-data` est configuré avec le même
+user id que celui employé par boot2docker.
 
-PhpMyAdmin can be reached from 
-http://[boot2docker ip]/phpmyadmin. Only the users `admin` and `user` can access
-phpMyAdmin.
+Mod rewrite activé.
 
-At your convenience, a not-so-random blowfish_secret is stored in phpMyAdmin 
-configuration, which is at `/var/www/phpmyadmin/config.inc.php`
+###PHP
+
+Modules inclus : Mysql, Apc, Xdebug, Imagick, Pear
+
+Xdebug est configuré avec le debugage à distance (conf/php/xdebug.ini)
 
 ###MySQL
 
-MySQL runs as user www-data, as well. This is not the best settings for production.
-However, this is needed for proving write support to mounted volumes under Mac OS X.
+MySQL fonctionne aussi avec l'utilisateur système `www-data`.
+*Ce n'est pas un paramètrage correct pour un environment de production.*
 
-####The three MySQL users
+En développement sur Mac OS X celà permet de gérer le droit d'écriture lorsqu'on monte un volume pour les données MySQL.
 
-The bundled MySQL server has two users, that are `root` and `admin`, and an optional
-third user `user`.
+Pour gérer la base de données il suffit de se connecter avec l'utilisateur root et sans mot de passe
+(* C'est un environment purement pour le développement *)
 
-The `root` account comes with an empty password, and it is for local connections
-(e.g., using some code). The `root` user cannot remotely access the database 
-(and the container).
+##Variables Environment
 
-However, the first time that you run your container, a new user `admin` 
-with all root privileges  will be created in MySQL with a random password. 
+- PHP_UPLOAD_MAX_FILESIZE [10M]
+- PHP_POST_MAX_SIZE [10M]
+- APACHE_VHOST_SERVERNAME [localhost] : vide par défaut, permet de configuré le VirtualHost avec un Servername tel que monapp.dev au lieu d'utiliser l'ip docker pour accèder à l'application
 
-To get the password, check the logs of the container by running:
+Utilisez le flag `-e` pour spécifier les variables d'environment.
 
-	docker logs [name or id, e.g., mywebsite]
+	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app -e APACHE_VHOST_SERVERNAME="monapp.dev" --name monapp yannux/lamp-basic
 
-You will see an output like the following:
-
-	========================================================================
-	You can now connect to this MySQL Server using:
-
-	    mysql -uadmin -p47nnf4FweaKu -h<host> -P<port>
-
-	Please remember to change the above password as soon as possible!
-	MySQL user 'root' has no password but only allows local connections
-	========================================================================
-
-In this case, `47nnf4FweaKu` is the password allocated to the `admin` user.
-
-Finally, an optional a user called `user` with password `password` can be created for your convenience either when:
- - The environment variable `CREATE_MYSQL_BASIC_USER_AND_DB` is true; or
- - Any of the `MYSQL_USER_*` variable (explained below) is true
-The user is called `user` and has as password `password`.
-
-The `user` user has full privileges on a database called `db`, which is also created
-for your convenience. As with the `admin` user, the user `user` can access
-the MySQL server from any host (`%`).
-The user name, password, and database name can be changed using
-the the `MYSQL_USER_*` variables, explained below.
-
-##Environment variables
-
-- `MYSQL_ADMIN_PASS="mypass"` will use your given MySQL password for the `admin`
-user instead of the random one.
-- `CREATE_MYSQL_BASIC_USER_AND_DB="true"` will create the user `user` with db `db` and password `password`. Not needed if using one of the following three `MYSQL_USER_*` variables
-- `MYSQL_USER_NAME="daniel"` will use your given MySQL username instead of `user`
-- `MYSQL_USER_DB="supercooldb"` will use your given database name instead of `db`
-- `MYSQL_USER_PASS="supersecretpassword"` will use your given password  instead of `password`
-- `PHP_UPLOAD_MAX_FILESIZE="10M"` will change PHP upload_max_filesize config value
-- `PHP_POST_MAX_SIZE="10M"` will change PHP post_max_size config value
--`VAGRANT_OSX_MODE="true"` for enabling Vagrant-compatibility
--`DOCKER_USER_ID=$(id -u)` for letting Vagrant use your host user ID for mounted folders
--`DOCKER_USER_GID=$(id -g)` for letting Vagrant use your host user GID for mounted folders
-
-Set these variables using the `-e` flag when invoking the `docker` client.
-
-	docker run -i -t -p "80:80" -p "3306:3306" -v ${PWD}/app:/app -e MYSQL_ADMIN_PASS="mypass" --name yourwebapp dgraziotin/lamp
-
-Please note that the MySQL variables will not work if an existing MySQL volume is supplied.

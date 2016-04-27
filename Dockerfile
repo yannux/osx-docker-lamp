@@ -1,10 +1,6 @@
+# lamp-basic
 FROM debian:squeeze
 MAINTAINER Yann Nave <ynave@onbebop.net>
-
-# based on phusion/baseimage:latest
-# MAINTAINER Daniel Graziotin <daniel@ineed.coffee>
-# based on tutumcloud/tutum-docker-lamp
-# MAINTAINER Fernando Mayo <fernando@tutum.co>, Feng Honglin <hfeng@tutum.co>
 
 ENV DOCKER_USER_ID 501
 ENV DOCKER_USER_GID 20
@@ -25,42 +21,42 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get -y install supervisor wget git nano apache2 libapache2-mod-php5 mysql-server php5-mysql pwgen php-pear php-apc php5-mcrypt zip unzip php5-imagick php5-xdebug
 
-# Add some PHP conf files
-ADD conf/php/xdebug.ini /etc/php5/apache2/conf.d/xdebug.ini
 
-# Add image configuration and scripts
+# APACHE & PHP
 ADD start-apache2.sh /start-apache2.sh
-ADD start-mysqld.sh /start-mysqld.sh
-ADD run.sh /run.sh
-RUN chmod 755 /*.sh
 ADD supervisord-apache2.conf /etc/supervisor/conf.d/supervisord-apache2.conf
-ADD supervisord-mysqld.conf /etc/supervisor/conf.d/supervisord-mysqld.conf
+ADD conf/apache/apache_default /etc/apache2/sites-available/default
 
-# Remove pre-installed database
-RUN rm -rf /var/lib/mysql
-
-# Add MySQL utils
-ADD create_mysql_users.sh /create_mysql_users.sh
-RUN chmod 755 /*.sh
-
-
-# config to enable .htaccess
-ADD apache_default /etc/apache2/sites-available/default
 RUN a2enmod rewrite & \
     rm /etc/apache2/sites-enabled/000-default & \
     a2ensite default
 
-# Configure /app folder with sample app
-RUN mkdir -p /app && rm -fr /var/www && ln -s /app /var/www
-ADD app/ /app
+ADD conf/php/xdebug.ini /etc/php5/apache2/conf.d/xdebug.ini
 
-#Environment variables to configure System & PHP & MYSQL
+## ENV
+ENV APACHE_VHOST_SERVERNAME localhost
 ENV PHP_UPLOAD_MAX_FILESIZE 10M
 ENV PHP_POST_MAX_SIZE 10M
-ENV MYSQL_ADMIN_PASS admin
-ENV APACHE_VHOST_SERVERNAME localhost
 
-# Add volumes for the app and MySql
+
+# MYSQL
+ADD supervisord-mysqld.conf /etc/supervisor/conf.d/supervisord-mysqld.conf
+ADD start-mysqld.sh /start-mysqld.sh
+ADD setup-mysql.sh /setup-mysql.sh
+RUN rm -rf /var/lib/mysql
+
+
+# Configure /app folder with sample app
+RUN mkdir -p /app
+ADD app/ /app
+
+
+# ALL & SYSTE%
+ADD run.sh /run.sh
+RUN chmod 755 /*.sh
+
+
+# VOLUMES
 VOLUME  ["/etc/mysql", "/var/lib/mysql", "/app" ]
 
 EXPOSE 80 3306
