@@ -22,7 +22,7 @@ RUN apt-get update && \
     apt-get -y install supervisor wget git nano apache2 libapache2-mod-php5 mysql-server php5-mysql pwgen php-pear php-apc php5-mcrypt zip unzip php5-imagick php5-xdebug
 
 
-# APACHE & PHP
+# # APACHE & PHP
 ADD start-apache2.sh /start-apache2.sh
 ADD supervisord-apache2.conf /etc/supervisor/conf.d/supervisord-apache2.conf
 ADD conf/apache/apache_default /etc/apache2/sites-available/default
@@ -33,13 +33,7 @@ RUN a2enmod rewrite & \
 
 ADD conf/php/xdebug.ini /etc/php5/apache2/conf.d/xdebug.ini
 
-## ENV
-ENV APACHE_VHOST_SERVERNAME localhost
-ENV PHP_UPLOAD_MAX_FILESIZE 10M
-ENV PHP_POST_MAX_SIZE 10M
-
-
-# MYSQL
+# # MYSQL
 ADD supervisord-mysqld.conf /etc/supervisor/conf.d/supervisord-mysqld.conf
 ADD start-mysqld.sh /start-mysqld.sh
 ADD setup-mysql.sh /setup-mysql.sh
@@ -55,6 +49,10 @@ ADD app/ /app
 ADD run.sh /run.sh
 RUN chmod 755 /*.sh
 
+# ENV
+ENV APACHE_VHOST_SERVERNAME localhost
+ENV PHP_UPLOAD_MAX_FILESIZE 10M
+ENV PHP_POST_MAX_SIZE 10M
 
 # VOLUMES
 VOLUME  ["/etc/mysql", "/var/lib/mysql", "/app" ]

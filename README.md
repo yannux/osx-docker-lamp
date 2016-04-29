@@ -4,6 +4,9 @@ Linux Apache MySQL PHP
 
 Dockerfile basé sur [osx-docker-lamp, a.k.a dgraziotin/lampp](https://registry.hub.docker.com/u/dgraziotin/lamp/) qui permet de [supporter l'écriture sur les volumes avec Boot2Docker sur Mac OS X](https://github.com/boot2docker/boot2docker/issues/581)
 
+## TODO
+- Vérifier la configuration remote xdebug
+
 ##Utilisation
 
 ###Créer un container basique
