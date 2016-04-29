@@ -1,5 +1,5 @@
 # lamp-basic
-FROM debian:squeeze
+FROM debian:jessie
 MAINTAINER Yann Nave <ynave@onbebop.net>
 
 ENV DOCKER_USER_ID 501
