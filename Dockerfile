@@ -25,11 +25,15 @@ RUN apt-get update && \
 # # APACHE & PHP
 ADD start-apache2.sh /start-apache2.sh
 ADD supervisord-apache2.conf /etc/supervisor/conf.d/supervisord-apache2.conf
-ADD conf/apache/apache_default /etc/apache2/sites-available/default
+ADD conf/apache/apache_default /etc/apache2/sites-available/000-default.conf
 
-RUN a2enmod rewrite & \
-    rm /etc/apache2/sites-enabled/000-default & \
-    a2ensite default
+RUN a2enmod rewrite
+
+## Inutile normalement en remplaçant juste 000-default.conf
+#     rm /etc/apache2/sites-enabled/000-default.conf & \
+#     ls  /etc/apache2/sites-available/
+
+# RUN a2ensite default
 
 ADD conf/php/xdebug.ini /etc/php5/apache2/conf.d/xdebug.ini
 
